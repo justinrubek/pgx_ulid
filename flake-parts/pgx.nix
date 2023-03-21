@@ -49,6 +49,10 @@
         pkgs.readline
         pkgs.zlib.dev
         pkgs.zlib.out
+
+        self'.packages."scripts/init-database"
+        self'.packages."scripts/start-database"
+        self'.packages."scripts/stop-database"
       ];
 
       LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
@@ -83,7 +87,7 @@
           ];
         };
 
-        targetPostgres = self'.packages.postgresql;
+        targetPostgres = self'.packages.postgresql_target;
         release = false;
 
         inherit (inputs) naersk;

@@ -16,7 +16,9 @@
   additionalFeatures ? [],
   doCheck ? true,
 }: let
+  # TODO: Ensure the .control file is present in the output
   # TODO: remove naersk usage and clean up
+  # TODO: expose the extension functionality in a way that allows for specifying the postgres version
   # leftover for naersk implementation
   inherit (pkgs) stdenv clangStdenv hostPlatform targetPlatform pkg-config openssl libiconv rust-bin llvmPackages runCommand;
   system = pkgs.system;
@@ -167,15 +169,6 @@
       fi
     '';
 
-    preFixup = ''
-      if [ -f "${name}.control" ]; then
-        ${cargo-pgx}/bin/cargo-pgx pgx stop all
-
-        mv -v $out/${targetPostgres.out}/* $out
-        rm -rfv $out/nix
-      fi
-    '';
-
     PGX_PG_SYS_SKIP_BINDING_REWRITE = "1";
     CARGO_BUILD_INCREMENTAL = "false";
     RUST_BACKTRACE = "full";
@@ -185,10 +178,43 @@
 
   deps-only = craneLib.buildDepsOnly ({} // common-build-args);
 
-  cranePackage = craneLib.buildPackage ({
+  cranePackage = craneLib.mkCargoDerivation ({
       pname = "${name}-pg${pgxPostgresMajor}";
       cargoArtifacts = deps-only;
       doCheck = false;
+      postBuild = common-build-args.postBuild;
+      buildPhaseCargoCommand = ''
+        cargoBuildLog=$(mktemp cargoBuildLogXXXX.json)
+        cargoWithProfile build --message-format json-render-diagnostics > $cargoBuildLog
+
+        ${cargo-pgx}/bin/cargo-pgx pgx package --pg-config ${targetPostgres}/bin/pg_config ${maybeDebugFlag} --features "${builtins.toString additionalFeatures}" --out-dir $out
+      '';
+
+      preFixup = ''
+        if [ -f "${name}.control" ]; then
+          ${cargo-pgx}/bin/cargo-pgx pgx stop all
+
+          # Clean up the build directory
+          # Copy the .control and .sql files to $out, then remove the excess
+          mv -v $out/${targetPostgres.out}/* $out
+          rm -rfv $out/nix
+
+        fi
+      '';
+
+      postInstall = ''
+        # copy the .so files to $out/lib
+        mkdir -p $out/lib
+        cp target/release/libulid.so $out/lib/ulid.so
+
+        # Copy the contents of $out/${targetPostgres.out}/* to $out, then remove $out/${targetPostgres.out}
+        ${cargo-pgx}/bin/cargo-pgx pgx stop all
+
+        mv -v $out/${targetPostgres.out}/* $out
+        rm -rfv $out/nix
+        rm -rfv $out/build
+        rm -rfv $out/target
+      '';
     }
     // common-build-args);
   # in naerskPackage
