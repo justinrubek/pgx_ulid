@@ -1,0 +1,8 @@
+{
+  config,
+  inputs,
+  lib,
+  self,
+  ...
+}: {
+}
