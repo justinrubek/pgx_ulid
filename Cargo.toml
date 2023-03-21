@@ -1,5 +1,6 @@
 [package]
 name    = "ulid"
+description = "PostgreSQL extension for ULID"
 publish = false
 version = "0.1.4"
 
