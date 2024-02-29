@@ -10,7 +10,7 @@
 # https://github.com/NixOS/nixpkgs/issues/107070#issuecomment-1120372429
 rustPlatform.buildRustPackage rec {
   pname = "cargo-pgrx";
-  version = "0.10.2";
+  version = "0.11.2";
 
   src = fetchCrate {
     inherit version pname;

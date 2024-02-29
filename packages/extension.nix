@@ -45,18 +45,6 @@
     ${cargo-pgrx}/bin/cargo-pgrx pgrx init \
       --pg${pgxPostgresMajor} $PGRX_HOME/${pgxPostgresMajor}/bin/pg_config \
 
-    # This is primarily for Mac or other Nix systems that don't use the nixbld user.
-    export USER=$(whoami)
-    export PGDATA=$PGRX_HOME/data-${pgxPostgresMajor}/
-    export NIX_PGLIBDIR=$PGRX_HOME/${pgxPostgresMajor}/lib
-
-    echo "starting postgres and creating user"
-    echo "unix_socket_directories = '$(mktemp -d)'" > $PGDATA/postgresql.conf
-    ${targetPostgres}/bin/pg_ctl start
-    ${targetPostgres}/bin/createuser -h localhost --superuser --createdb $USER || true
-    ${targetPostgres}/bin/pg_ctl stop
-    echo "postgres stopped"
-
     # Set C flags for Rust's bindgen program. Unlike ordinary C
     # compilation, bindgen does not invoke $CC directly. Instead it
     # uses LLVM's libclang. To make sure all necessary flags are
@@ -101,6 +89,7 @@
         export NIX_PGLIBDIR=${targetPostgres.out}/share/postgresql/extension/
         echo "About to call cargo-pgrx pgrx package"
         ${cargo-pgrx}/bin/cargo-pgrx pgrx package --pg-config ${targetPostgres}/bin/pg_config ${maybeDebugFlag} --features "${builtins.toString additionalFeatures}" --out-dir $out
+        rm -rf $out/target
         echo "Package complete"
         export NIX_PGLIBDIR=$PGRX_HOME/${pgxPostgresMajor}/lib
       fi
@@ -198,6 +187,7 @@
           # Copy the .control and .sql files to $out, then remove the excess
           mv -v $out/${targetPostgres.out}/* $out
           rm -rfv $out/nix
+          rm -rfv $out/target
 
         fi
       '';

@@ -230,16 +230,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1709074623,
-        "narHash": "sha256-ovzUX6MV74Hwm+OVnb5kDCFovGtMy1WDOlEAVu97zds=",
-        "owner": "tcdi",
-        "repo": "pgx",
-        "rev": "3e530b6fdc99f2bbeab168dc48819a7810351254",
+        "lastModified": 1698779972,
+        "narHash": "sha256-BB9ftsLYwc4sd6c7JI8gyG9brL+PXq6Ep82fXiN3sDQ=",
+        "owner": "pgcentralfoundation",
+        "repo": "pgrx",
+        "rev": "16364772b42e66315c152743c0fd06c09ef6345b",
         "type": "github"
       },
       "original": {
-        "owner": "tcdi",
-        "repo": "pgx",
+        "owner": "pgcentralfoundation",
+        "repo": "pgrx",
+        "rev": "16364772b42e66315c152743c0fd06c09ef6345b",
         "type": "github"
       }
     },

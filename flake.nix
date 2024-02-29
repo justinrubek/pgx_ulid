@@ -14,7 +14,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     pgx = {
-      url = "github:tcdi/pgx";
+      url = "github:pgcentralfoundation/pgrx/16364772b42e66315c152743c0fd06c09ef6345b";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.fenix.follows = "fenix";
     };
